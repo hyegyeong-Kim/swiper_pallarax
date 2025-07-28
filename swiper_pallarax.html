@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swiper + GSAP Scale</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .swiper {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .swiper-slide {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide-bg {
+      position: absolute;
+      top: -15vh;
+      left: 0;
+      width: 100%;
+      height: 130vh;
+      background-size: cover;
+      background-position: center;
+      z-index: -1;
+      pointer-events: none;
+      transform: scale(1);
+      transition:all 3s;
+    }
+
+    .slide-title {
+      font-size: 4vw;
+      font-weight: bold;
+      color: white;
+      z-index: 1;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+      color: white;
+    }
+
+    .swiper-pagination-bullet {
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="swiper" id="parallax-swiper">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide" data-index="0">
+      <div class="slide-bg" style="background-image: url('https://picsum.photos/id/1003/1920/1080');"></div>
+      <div class="slide-title">Slide 1</div>
+    </div>
+    <div class="swiper-slide" data-index="1">
+      <div class="slide-bg" style="background-image: url('https://picsum.photos/id/1016/1920/1080');"></div>
+      <div class="slide-title">Slide 2</div>
+    </div>
+    <div class="swiper-slide" data-index="2">
+      <div class="slide-bg" style="background-image: url('https://picsum.photos/id/1019/1920/1080');"></div>
+      <div class="slide-title">Slide 3</div>
+    </div>
+  </div>
+
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-pagination"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+
+
+  let isFirstLoad = true;
+
+  const swiper = new Swiper('#parallax-swiper', {
+    direction: 'vertical',
+    speed: 1200,
+    loop: true,
+    mousewheel: true,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    on: {
+      init: function () {
+        // 첫 번째 슬라이드만 초기 확대
+        setTimeout(() => {
+          const firstBg = document.querySelector('.swiper-slide-active .slide-bg');
+          if (firstBg) {
+            gsap.set(firstBg, { scale: 1.3 });
+          }
+        }, 10);
+      },
+      slideChangeTransitionStart: function () {
+        // 모든 배경 scale 초기화
+        document.querySelectorAll('.slide-bg').forEach(bg => {
+          gsap.to(bg, { scale: 1, duration: 1.2, ease: 'power2.out' });
+        });
+
+        const activeSlide = document.querySelector('.swiper-slide-active');
+        const realIndex = swiper.realIndex;
+
+        const bg = activeSlide?.querySelector('.slide-bg');
+
+        // ✅ 최초 로딩일 때만 제외, 이후에는 realIndex가 0이더라도 scale 적용
+        if (bg) {
+          if (realIndex === 0 && isFirstLoad) {
+            isFirstLoad = false;
+            return;
+          }
+          gsap.to(bg, { scale: 1.3, duration: 1.2, ease: 'power2.out' });
+        }
+      }
+    }
+  });
+
+
+
+</script>
+</body>
+</html>

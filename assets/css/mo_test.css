@@ -1,0 +1,7 @@
+h2 {color:rosybrown; font-size:50px;}
+strong {font-size:20px;}
+ul, ol {display:flex; align-items:center; gap:50px;}
+ul li, ol li {display:flex; align-items:center; gap:5px}
+input[type=radio]{display: none;}
+input[type=radio]+label {padding:10px; background:#ccc;}
+input[type=radio]:checked+label {color:#fff; background:#000;}

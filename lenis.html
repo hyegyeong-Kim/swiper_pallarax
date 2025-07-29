@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lenis + ScrollTrigger 완전 연동</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+
+    #lenis-wrapper {
+      height: 100%;
+    }
+
+    #lenis-content {
+      will-change: transform;
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+    }
+
+    .box {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="lenis-wrapper">
+    <div id="lenis-content">
+      <section style="background:#f8f8f8;"><div class="box">Section 1</div></section>
+      <section style="background:#e0f7fa;"><div class="box">Section 2</div></section>
+      <section style="background:#d1c4e9;"><div class="box">Section 3</div></section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1/bundled/lenis.min.js"></script>
+
+  <script>
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smooth: true,
+    smoothTouch: false
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+
+  requestAnimationFrame(raf);
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  ScrollTrigger.scrollerProxy('#lenis-content', {
+    scrollTop(value) {
+      return arguments.length
+        ? lenis.scrollTo(value, { immediate: true })
+        : window.scrollY;
+    },
+    getBoundingClientRect() {
+      return {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+    },
+    pinType: document.querySelector('#lenis-content').style.transform ? "transform" : "fixed"
+  });
+
+  gsap.utils.toArray(".box").forEach((box) => {
+    gsap.fromTo(box,
+      { opacity: 0, y: 60 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: box,
+          start: "top 80%",
+          end: "bottom 60%",
+          scrub: false,
+          scroller: "#lenis-content",
+          toggleActions: "play none none none"
+        }
+      }
+    );
+  });
+
+  ScrollTrigger.refresh();
+  </script>
+</body>
+</html>

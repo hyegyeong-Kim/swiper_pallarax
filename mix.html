@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GSAP Fullpage + Scroll Sequence</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      /* overflow: hidden; */
+      font-family: sans-serif;
+    }
+
+
+
+    #lenis-content {
+      will-change: transform;
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+      color: #fff;
+    }
+
+    .section1 { background: #111; }
+    .section2 {
+      background: royalblue;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ✅ 흰 화면 방지용 배경 고정 */
+    .section2::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: royalblue;
+      z-index: -1;
+    }
+
+    .section3 { background: #f9a825; }
+    .section4 { background: #4caf50; }
+
+    .image-sequence {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .image-sequence p {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(50px);
+      opacity: 0;
+      margin: 0;
+    }
+
+    .image-sequence img {
+      max-width: 80%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="lenis-wrapper">
+    <div id="lenis-content">
+      <section class="section1">Section 1</section>
+
+      <section class="section2">
+        <div class="image-sequence">
+          <p><img src="/assets/img/Frame 87 on.png" alt="img1" /></p>
+          <p><img src="/assets/img/Frame 88 on.png" alt="img2" /></p>
+          <p><img src="/assets/img/Frame 89 on.png" alt="img3" /></p>
+          <p><img src="/assets/img/Frame 90 on.png" alt="img4" /></p>
+          <p><img src="/assets/img/Frame 91 on.png" alt="img5" /></p>
+          <p><img src="/assets/img/Frame 93 on.png" alt="img6" /></p>
+        </div>
+      </section>
+
+      <section class="section3">Section 3</section>
+      <section class="section4">Section 4</section>
+    </div>
+  </div>
+
+  <!-- ✅ CDN Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.36/dist/lenis.min.js"></script>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({
+      smooth: true,
+      lerp: 0.1,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // ✅ Lenis + ScrollTrigger 연동
+    ScrollTrigger.scrollerProxy("#lenis-content", {
+      scrollTop(value) {
+        return arguments.length
+          ? lenis.scrollTo(value, { immediate: true })
+          : window.scrollY;
+      },
+      getBoundingClientRect() {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight
+        };
+      },
+      pinType: document.querySelector("#lenis-content").style.transform
+        ? "transform"
+        : "fixed"
+    });
+
+    ScrollTrigger.defaults({ scroller: "#lenis-content" });
+
+    // ✅ Scroll Sequence Timeline
+    const images = document.querySelectorAll('.section2 .image-sequence p');
+
+    const imageTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section2",
+        start: "top top",
+        end: "+=5000",
+        scrub: true,
+        pin: true,
+        scroller: "#lenis-content"
+      }
+    });
+
+    images.forEach((el, index) => {
+      imageTimeline.to(el, { opacity: 1, y: 0, duration: 0.5 });
+
+      // 마지막 이미지 사라지지 않도록 설정
+      if (index !== images.length - 1) {
+        imageTimeline.to(el, { opacity: 0, y: -50, duration: 0.5 }, "+=0.5");
+      }
+    });
+
+    ScrollTrigger.addEventListener("refresh", () => lenis.update && lenis.update());
+    ScrollTrigger.refresh();
+  </script>
+</body>
+</html>

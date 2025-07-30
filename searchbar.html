@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>검색바 + 최근검색어 삭제버튼</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 50px;
+      background: #f2f2f2;
+    }
+
+    .search-container {
+      width: 300px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 40px 10px 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .search-box button {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .suggestions,
+    .recent-searches {
+      background: #fff;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 5px;
+      padding: 10px;
+      display: none;
+      box-sizing: border-box;
+    }
+
+    .suggestions div,
+    .recent-searches li {
+      padding: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .suggestions div:hover,
+    .recent-searches li:hover {
+      background: #efefef;
+    }
+
+    .recent-searches strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .recent-searches ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="검색어를 입력하세요..." autocomplete="off" />
+      <button id="search-btn">🔍</button>
+    </div>
+
+    <div class="suggestions" id="suggestions-box"></div>
+
+    <div class="recent-searches" id="recent-box">
+      <strong>최근 검색어</strong>
+      <ul id="recent-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const suggestionsBox = document.getElementById('suggestions-box');
+    const recentBox = document.getElementById('recent-box');
+    const recentList = document.getElementById('recent-list');
+
+    const relatedKeywords = [
+      "자바스크립트", "자바스크립트 배열", "자바스크립트 함수",
+      "HTML 태그", "CSS Flexbox", "CSS Grid", "프론트엔드", "React"
+    ];
+
+    // ✅ 최근 검색어 불러오기
+    function loadRecentSearches() {
+      const data = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      recentList.innerHTML = "";
+
+      data.slice(0, 5).forEach((item, index) => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.textContent = item;
+        span.style.flex = "1";
+        span.onclick = () => {
+          input.value = item;
+          showSuggestions(item);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerHTML = "❌";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // 삭제버튼 누를 때 검색어 입력 방지
+          deleteRecentSearch(item);
+        };
+
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
+        recentList.appendChild(li);
+      });
+
+      recentBox.style.display = data.length ? "block" : "none";
+    }
+
+    // ✅ 최근 검색어 삭제
+    function deleteRecentSearch(keyword) {
+      let history = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      history = history.filter(item => item !== keyword);
+      localStorage.setItem("recentSearches", JSON.stringify(history));
+      loadRecentSearches();
+    }
+
+    // ✅ 최근 검색어 저장
+    function saveRecentSearch(keyword) {
+      let history = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+      history = history.filter(item => item !== keyword);
+      history.unshift(keyword);
+      localStorage.setItem("recentSearches", JSON.stringify(history.slice(0, 10)));
+      loadRecentSearches();
+    }
+
+    // ✅ 연관 검색어 표시
+    function showSuggestions(keyword) {
+      const matches = relatedKeywords.filter(word =>
+        word.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (matches.length) {
+        suggestionsBox.innerHTML = matches.map(item => `<div>${item}</div>`).join("");
+        suggestionsBox.style.display = "block";
+
+        suggestionsBox.querySelectorAll('div').forEach(div => {
+          div.onclick = () => {
+            input.value = div.textContent;
+            suggestionsBox.style.display = "none";
+          };
+        });
+      } else {
+        suggestionsBox.style.display = "none";
+      }
+    }
+
+    // ✅ 검색 실행
+    searchBtn.onclick = () => {
+      const keyword = input.value.trim();
+      if (!keyword) return;
+      saveRecentSearch(keyword);
+      suggestionsBox.style.display = "none";
+      alert(`"${keyword}" 검색 실행!`);
+    };
+
+    // ✅ 입력 시 자동완성 표시
+    input.addEventListener('input', () => {
+      const keyword = input.value.trim();
+      if (keyword) {
+        showSuggestions(keyword);
+      } else {
+        suggestionsBox.style.display = "none";
+      }
+    });
+
+    loadRecentSearches();
+  </script>
+</body>
+</html>

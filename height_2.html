@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/common.css">
+    <title>Document</title>
+    <style>
+        header {padding:20px;}
+        .content section {height:100vh; display:flex; align-items:center; justify-content:center;}
+        .content section:first-of-type {height:300vh; border:2px solid hotpink;}
+        .content section:last-of-type {border:2px solid blue;}
+        .content section p {
+            width:300px;
+            height:300px;
+            color:#fff;
+            font-size:70px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.8s;
+        }
+
+        /* 색상만 다르게 지정 */
+        .content section:first-of-type p {
+            background: royalblue;
+        }
+        .content section:last-of-type p {
+            background: orangered;
+        }
+
+        /* 나타나는 효과 */
+        .content section p.on {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        ul {height:200vh; display:flex; justify-content:center; align-items:center; gap:5px;} 
+        ul li {width:200px; height:200px; background:hotpink; display:flex; justify-content:center; align-items:center; opacity:0; transform: translateY(100px); transition: all 0.8s; transition-delay: 0s; /* ✅ 초기화 */}
+        ul li.on {opacity:1; transform: translateY(0);}
+    </style>
+    <script>
+        function checkElementInViewport($el, ratio = 0.6) {
+            const winScroll = $(window).scrollTop();
+            const winHeight = $(window).height();
+            const triggerPoint = winScroll + winHeight * ratio;
+
+            const elTop = $el.offset().top;
+            const elBottom = elTop + $el.outerHeight();
+
+            return triggerPoint > elTop && triggerPoint < elBottom;
+        }
+
+
+        function revealItemsByCenterTrigger($container, itemSelector, options = {}) {
+            const {
+                offset = 100,          // 화면 중앙과의 거리 허용 범위
+                delayStep = 0.2,       // 항목별 지연 시간 간격 (초)
+                className = 'on'       // 적용할 클래스명
+            } = options;
+
+            $container.each(function () {
+                const $target = $(this);
+                const $items = $target.find(itemSelector);
+
+                const targetTop = $target.offset().top;
+                const targetHeight = $target.outerHeight();
+                const targetCenter = targetTop + targetHeight / 2;
+
+                const winScroll = $(window).scrollTop();
+                const winHeight = $(window).height();
+                const viewCenter = winScroll + winHeight / 2;
+
+                if (Math.abs(viewCenter - targetCenter) < offset) {
+                    $items.each(function (i) {
+                        const delay = i * delayStep;
+                        $(this)
+                        .css('transition-delay', `${delay}s`)
+                        .addClass(className);
+                    });
+                } 
+                // else {
+                //     $items.each(function () {
+                //         $(this)
+                //         .css('transition-delay', '0s')
+                //         .removeClass(className);
+                //     });
+                // }
+            });
+        }
+
+        $(function () {
+            $(window).on('scroll', function () {
+                $('.content section').each(function () {
+                    const $p = $(this).find('p');
+                    if (checkElementInViewport($p, 0.6)) {
+                        $p.addClass('on');
+                    }
+                });
+                revealItemsByCenterTrigger($('.content ul'), 'li', {
+                    offset: 120,       // 중앙과의 거리 오차 허용
+                    delayStep: 0.5,    // li 하나당 지연 시간
+                    className: 'on'    // 붙일 클래스
+                });
+
+
+            });
+
+            $(window).trigger('scroll');
+        });
+    </script>
+
+
+</head>
+<body>
+    <div id="wrap">
+        <header>
+            Header
+        </header>
+        <div class="content">
+            <section>
+                <p>box1</p>
+            </section>
+            <section>
+                <p>box2</p>
+            </section>
+            <ul>
+                <li>box3_1</li>
+                <li>box3_2</li>
+                <li>box3_3</li>
+                <li>box3_4</li>
+            </ul>
+        </div>
+        <footer>
+            Footer
+        </footer>
+    </div>
+</body>
+</html>

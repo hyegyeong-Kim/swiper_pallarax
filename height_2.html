@@ -139,32 +139,34 @@
                         items[i].style.transitionDelay = `${i * delayStep}s`;
                         items[i].classList.add(className);
                     }
-                } else {
-                    for (let i = 0; i < items.length; i++) {
-                        items[i].style.transitionDelay = '0s';
-                        items[i].classList.remove(className);
-                    }
-                }
+                } 
+
+                // else {
+                //     for (let i = 0; i < items.length; i++) {
+                //         items[i].style.transitionDelay = '0s';
+                //         items[i].classList.remove(className);
+                //     }
+                // }
             }
         }
 
 
-    // ✅ 스크롤 이벤트 연결
-    window.addEventListener('scroll', () => {
-        revealItemsByCenterTrigger('.content ul', 'li', {
-            offset: 100,
-            delayStep: 0.5,
-            className: 'on'
+        // ✅ 스크롤 이벤트 연결
+        window.addEventListener('scroll', () => {
+            revealItemsByCenterTrigger('.content ul', 'li', {
+                offset: 100,
+                delayStep: 0.5,
+                className: 'on'
+            });
         });
-    });
 
-    window.addEventListener('load', () => {
-        revealItemsByCenterTrigger('.content ul', 'li', {
-            offset: 100,
-            delayStep: 0.5,
-            className: 'on'
+        window.addEventListener('load', () => {
+            revealItemsByCenterTrigger('.content ul', 'li', {
+                offset: 100,
+                delayStep: 0.5,
+                className: 'on'
+            });
         });
-    });
     </script>
 
 

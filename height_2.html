@@ -41,7 +41,8 @@
         ul li {width:200px; height:200px; background:hotpink; display:flex; justify-content:center; align-items:center; opacity:0; transform: translateY(100px); transition: all 0.8s; transition-delay: 0s; /* ✅ 초기화 */}
         ul li.on {opacity:1; transform: translateY(0);}
     </style>
-    <script>
+    <!-- 제이쿼리용용 함수 -->
+    <!-- <script>
         function checkElementInViewport($el, ratio = 0.6) {
             const winScroll = $(window).scrollTop();
             const winHeight = $(window).height();
@@ -110,6 +111,60 @@
 
             $(window).trigger('scroll');
         });
+    </script> -->
+
+    <!-- 바닐라js 함수 -->
+    <script>
+        // ✅ 화면 중앙에 가까워졌을 때, 자식 요소를 순차적으로 애니메이션시키는 함수
+        function revealItemsByCenterTrigger(containerSelector, itemSelector, options = {}) {
+            const {
+                offset = 100,
+                delayStep = 0.2,
+                className = 'on'
+            } = options;
+            const containers = document.querySelectorAll(containerSelector);
+            for (let container of containers) {
+                const items = container.querySelectorAll(itemSelector);
+                if (!items.length) continue;
+
+                const rect = container.getBoundingClientRect();
+                const targetCenter = rect.top + rect.height / 2;
+                const viewCenter = window.innerHeight / 2;
+
+                // 디버깅 로그
+                console.log('ul center:', targetCenter.toFixed(2), 'view center:', viewCenter.toFixed(2), 'diff:', Math.abs(viewCenter - targetCenter).toFixed(2));
+
+                if (Math.abs(viewCenter - targetCenter) < offset) {
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].style.transitionDelay = `${i * delayStep}s`;
+                        items[i].classList.add(className);
+                    }
+                } else {
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].style.transitionDelay = '0s';
+                        items[i].classList.remove(className);
+                    }
+                }
+            }
+        }
+
+
+    // ✅ 스크롤 이벤트 연결
+    window.addEventListener('scroll', () => {
+        revealItemsByCenterTrigger('.content ul', 'li', {
+            offset: 100,
+            delayStep: 0.5,
+            className: 'on'
+        });
+    });
+
+    window.addEventListener('load', () => {
+        revealItemsByCenterTrigger('.content ul', 'li', {
+            offset: 100,
+            delayStep: 0.5,
+            className: 'on'
+        });
+    });
     </script>
 
 

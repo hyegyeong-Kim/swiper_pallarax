@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="/assets/css/common.css">
   <title>IntersectionObserver 스크롤 애니메이션</title>
   <style>
     body {
@@ -19,16 +20,18 @@
       font-size: 2rem;
     }
 
-    .box, .new {
+    .box, .new, p, li {
       opacity: 0;
       transform: translateY(80px);
       transition: all 0.8s ease-out;
     }
+    p {margin-left:20px;}
 
-    .box.visible, .new.visible {
+    .box.visible, .new.visible, p.visible, li.visible {
       opacity: 1;
       transform: translateY(0);
     }
+    ul {margin-left:100px;}
   </style>
 </head>
 <body>
@@ -55,27 +58,74 @@
     <section style="background: #bbdefb;">
     <div class="new">스크롤하면 등장하는 박스 5</div>
   </section>
-    <section style="background: #ffe082;">
+  <section style="background: #ffe082;">
     <div class="new">스크롤하면 등장하는 박스 6</div>
   </section>
+  <section style="background: #eee;">
+    <p>test1</p>
+    <p>test2</p>
+    <p>test3</p>
+    <p>test4</p>
+    <ul>
+      <li>t1</li>
+      <li>t2</li>
+      <li>t3</li>
+      <li>t4</li>
+    </ul>
+  </section>
+  
 
   <script>
-    const boxes = document.querySelectorAll('.box');
-    const news = document.querySelectorAll('.new');
+const boxes = document.querySelectorAll('.box');
+const news = document.querySelectorAll('.new');
+const tests = document.querySelectorAll('section p');
+const lis = document.querySelectorAll('ul li');
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target); // 한 번만 실행
-        }
-      });
-    }, {
-      threshold: 0.5
-    });
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target); // 한 번만 실행
+    }
+  });
+}, {
+  threshold: 0.5
+});
 
-    boxes.forEach(box => observer.observe(box));
-    news.forEach(item => observer.observe(item));
+// box, new 요소 관찰
+boxes.forEach(box => observer.observe(box));
+news.forEach(item => observer.observe(item));
+
+// p 요소 순차 등장 처리
+tests.forEach((el, index) => {
+  el.style.transitionDelay = `${index * 0.2}s`;
+  observer.observe(el);
+});
+
+// ✅ 마지막 p가 애니메이션 끝난 후 li 실행
+const lastP = tests[tests.length - 1];
+const totalDelay = (tests.length - 1) * 0.2 + 0.8; // 마지막 p까지의 총 애니메이션 시간 (delay + duration)
+
+const liObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        lis.forEach((li, index) => {
+          li.style.transitionDelay = `${index * 0.2}s`;
+          li.classList.add('visible');
+        });
+      }, totalDelay * 1000); // 마지막 p 끝난 후 실행
+      liObserver.unobserve(entry.target);
+    }
+  });
+}, { 
+  threshold: 0.5 
+});
+
+liObserver.observe(lastP);
+
+
+
   </script>
 
 </body>

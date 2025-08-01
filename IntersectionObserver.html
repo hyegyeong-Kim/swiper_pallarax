@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IntersectionObserver 스크롤 애니메이션</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #f5f5f5;
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+    }
+
+    .box, .new {
+      opacity: 0;
+      transform: translateY(80px);
+      transition: all 0.8s ease-out;
+    }
+
+    .box.visible, .new.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <section style="background: #eee;">
+    <p>⬇ 아래로 스크롤 해보세요</p>
+  </section>
+
+  <section style="background: #c8e6c9;">
+    <div class="box">스크롤하면 등장하는 박스 1</div>
+  </section>
+
+  <section style="background: #bbdefb;">
+    <div class="box">스크롤하면 등장하는 박스 2</div>
+  </section>
+
+  <section style="background: #eee;">
+    <div class="box">스크롤하면 등장하는 박스 3</div>
+  </section>
+
+  <section style="background: #c8e6c9;">
+    <div class="new">스크롤하면 등장하는 박스 4</div>
+  </section>
+    <section style="background: #bbdefb;">
+    <div class="new">스크롤하면 등장하는 박스 5</div>
+  </section>
+    <section style="background: #ffe082;">
+    <div class="new">스크롤하면 등장하는 박스 6</div>
+  </section>
+
+  <script>
+    const boxes = document.querySelectorAll('.box');
+    const news = document.querySelectorAll('.new');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // 한 번만 실행
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+
+    boxes.forEach(box => observer.observe(box));
+    news.forEach(item => observer.observe(item));
+  </script>
+
+</body>
+</html>

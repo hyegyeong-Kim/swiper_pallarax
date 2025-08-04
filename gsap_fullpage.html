@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GSAP Fullpage Scroll</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      /* overflow: hidden; */
+      font-family: sans-serif;
+    }
+
+    .section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+      position: relative;
+    }
+
+    .section1 { background: #111; }
+    .section2 { background: #1976d2; }
+    .section3 { background: #4caf50; }
+
+    .parallax-text {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <section class="section section1"><div class="parallax-text">Section 1</div></section>
+  <section class="section section2"><div class="parallax-text">Section 2</div></section>
+  <section class="section section3"><div class="parallax-text">Section 3</div></section>
+</div>
+
+<!-- GSAP + Plugins -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
+
+<script>
+  gsap.registerPlugin(ScrollToPlugin);
+
+  const sections = document.querySelectorAll(".section");
+  let currentIndex = 0;
+  let isAnimating = false;
+
+  // 🔁 휠 이벤트로 섹션 전환
+  window.addEventListener("wheel", (e) => {
+    if (isAnimating) return;
+
+    if (e.deltaY > 0) {
+      // next
+      if (currentIndex < sections.length - 1) {
+        currentIndex++;
+        scrollToSection(currentIndex);
+      }
+    } else {
+      // prev
+      if (currentIndex > 0) {
+        currentIndex--;
+        scrollToSection(currentIndex);
+      }
+    }
+  });
+
+  function scrollToSection(index) {
+    isAnimating = true;
+    gsap.to(window, {
+      duration: 1.2,
+      scrollTo: {
+        y: sections[index],
+        autoKill: false
+      },
+      ease: "power2.out",
+      onComplete: () => {
+        isAnimating = false;
+        animateText(sections[index]);
+      }
+    });
+  }
+
+  // ✅ 최초 0번 섹션 텍스트 애니메이션
+  window.addEventListener("load", () => {
+    scrollToSection(0);
+  });
+
+  // ✅ 패럴럭스 텍스트 애니메이션
+  function animateText(section) {
+    const el = section.querySelector(".parallax-text");
+    gsap.fromTo(el, { y: 50, opacity: 0 }, {
+      y: 0, opacity: 1, duration: 1.2, ease: "power3.out"
+    });
+  }
+</script>
+
+</body>
+</html>

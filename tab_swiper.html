@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabbed Swiper Groups</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f8f8f8; }
+
+    /* 탭 스타일 */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 20px 0;
+    }
+
+    .tabs button {
+      padding: 10px 20px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .tabs button.active {
+      background: #007bff;
+      color: #fff;
+    }
+
+    /* Swiper wrapper 영역 */
+    .swiper-group {
+      display: none;
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto 50px;
+    }
+
+    .swiper-group.active {
+      display: block;
+    }
+
+    .swiper {
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      background: #e0e0e0;
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 탭 버튼 -->
+  <div class="tabs">
+    <button class="tab active" data-target="swiperA">탭 1</button>
+    <button class="tab" data-target="swiperB">탭 2</button>
+    <button class="tab" data-target="swiperC">탭 3</button>
+  </div>
+
+  <!-- Swiper 그룹 A -->
+  <div class="swiper-group active" id="swiperA">
+    <div class="swiper mySwiperA">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">a-1</div>
+        <div class="swiper-slide">a-2</div>
+        <div class="swiper-slide">a-3</div>
+      </div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+
+  <!-- Swiper 그룹 B -->
+  <div class="swiper-group" id="swiperB">
+    <div class="swiper mySwiperB">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">b-1</div>
+        <div class="swiper-slide">b-2</div>
+        <div class="swiper-slide">b-3</div>
+      </div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+
+  <!-- Swiper 그룹 C -->
+  <div class="swiper-group" id="swiperC">
+    <div class="swiper mySwiperC">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">c-1</div>
+        <div class="swiper-slide">c-2</div>
+        <div class="swiper-slide">c-3</div>
+      </div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+
+  <!-- 스크립트 -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Swiper 인스턴스 각각 생성
+    const swiperA = new Swiper(".mySwiperA", {
+      loop: true,
+      navigation: {
+        nextEl: "#swiperA .swiper-button-next",
+        prevEl: "#swiperA .swiper-button-prev",
+      },
+    });
+
+    const swiperB = new Swiper(".mySwiperB", {
+      loop: true,
+      navigation: {
+        nextEl: "#swiperB .swiper-button-next",
+        prevEl: "#swiperB .swiper-button-prev",
+      },
+    });
+
+    const swiperC = new Swiper(".mySwiperC", {
+      loop: true,
+      navigation: {
+        nextEl: "#swiperC .swiper-button-next",
+        prevEl: "#swiperC .swiper-button-prev",
+      },
+    });
+
+    // 탭 클릭 시 스와이퍼 그룹 표시
+    const tabs = document.querySelectorAll(".tab");
+    const swiperGroups = document.querySelectorAll(".swiper-group");
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        // 탭 활성화 처리
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        // 그룹 표시 처리
+        const target = tab.dataset.target;
+        swiperGroups.forEach(group => {
+          group.classList.toggle("active", group.id === target);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

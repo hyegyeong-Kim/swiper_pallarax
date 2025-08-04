@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>동기화된 Swiper + Autoplay + Navigation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: sans-serif;
+      background: #f0f0f0;
+    }
+    .swiper-container {position:relative;}
+    .swiper {
+      width: 600px;
+      height: 200px;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .swiper-slide {
+      background: #333;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .swiper.b .swiper-slide {
+      background: #1976d2;
+    }
+
+    .swiper-button-next, .swiper-button-prev {
+      color: #000;
+    }
+
+    .nav-container {
+      width: 600px;
+      margin: 10px auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .swiper-button-prev, .swiper-button-next {
+      position: relative;
+      top: 0;
+      transform: none;
+      margin: 0 10px;
+    }
+    .nav-container {width:900px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);}
+  </style>
+</head>
+<body>
+
+<div id="wrap">
+  <div class="swiper-container">
+      <!-- Swiper A -->
+    <div class="swiper a">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">A - Slide 1</div>
+        <div class="swiper-slide">A - Slide 2</div>
+        <div class="swiper-slide">A - Slide 3</div>
+      </div>
+    </div>
+
+    <!-- Swiper B -->
+    <div class="swiper b">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">B - Slide 1</div>
+        <div class="swiper-slide">B - Slide 2</div>
+        <div class="swiper-slide">B - Slide 3</div>
+      </div>
+    </div>
+      <!-- Navigation buttons -->
+    <div class="nav-container">
+      <div class="swiper-button-prev" id="customPrev"></div>
+      <div class="swiper-button-next" id="customNext"></div>
+    </div>
+  </div>  
+
+    <!-- Swiper C -->
+  <div class="swiper c">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">C - Slide 1</div>
+      <div class="swiper-slide">C - Slide 2</div>
+      <div class="swiper-slide">C - Slide 3</div>
+    </div>
+  </div>
+
+    <!-- Swiper D -->
+  <div class="swiper d">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">D - Slide 1</div>
+      <div class="swiper-slide">D - Slide 2</div>
+      <div class="swiper-slide">D - Slide 3</div>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Swiper A (메인 컨트롤러)
+    const swiperA = new Swiper('.swiper.a', {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 10,
+    //   autoplay: {
+    //     delay: 5500,
+    //     disableOnInteraction: false,
+    //   },
+        navigation: {
+          nextEl: '#customNext',
+          prevEl: '#customPrev',
+        },
+        controller: {
+          control: null // 이후 연결
+        }
+    });
+
+    // Swiper B (동기화 대상)
+    const swiperB = new Swiper('.swiper.b', {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 10,
+        allowTouchMove: true, // B에서 직접 조작 안되게
+        controller: {
+          control: null
+        }
+    });
+
+        // Swiper B (동기화 대상)
+    const swiperC = new Swiper('.swiper.c', {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 10,
+        allowTouchMove: true, // B에서 직접 조작 안되게
+        controller: {
+          control: null
+        }
+    });
+
+        // Swiper B (동기화 대상)
+    const swiperD = new Swiper('.swiper.d', {
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 10,
+        allowTouchMove: true, // B에서 직접 조작 안되게
+        controller: {
+          control: null
+        }
+    });
+
+    // 서로 연결
+    swiperA.controller.control = swiperB;
+    swiperB.controller.control = swiperA;
+    swiperC.controller.control = swiperD;
+    swiperD.controller.control = swiperC;
+
+  </script>
+</body>
+</html>

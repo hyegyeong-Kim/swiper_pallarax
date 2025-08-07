@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>예약 캘린더</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 40px;
+      background: #fff;
+    }
+
+    .calendar-container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .calendar {
+      border: 1px solid #ddd;
+      padding: 20px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .days, .dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      gap: 4px;
+    }
+
+    .day {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .date {
+      height: 40px;
+      line-height: 40px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .date:hover {
+      background: #eee;
+    }
+
+    .empty {
+      pointer-events: none;
+    }
+
+    .reserved {
+      color: #999;
+      pointer-events: none;
+    }
+
+    .waiting {
+      color: #d288b2;
+    }
+
+    .selected {
+      background-color: #00a8a8;
+      color: #fff;
+    }
+
+    .side-panel {
+      border: 1px solid #ddd;
+      padding: 20px;
+      width: 250px;
+    }
+
+    .check-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .check-info span {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      line-height: 100px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .room-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .room-control button {
+      width: 30px;
+      height: 30px;
+    }
+
+    .room-control input {
+      width: 40px;
+      text-align: center;
+    }
+
+    .search-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      background: #00a8a8;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .legend {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="legend">
+  <span style="background: black;"></span> 예약 가능
+  &nbsp;&nbsp;
+  <span style="background: pink;"></span> 대기 등록
+</div>
+
+<div class="calendar-container">
+  <div class="calendar" id="calendar-1"></div>
+  <div class="calendar" id="calendar-2"></div>
+  <div class="side-panel">
+    <div class="check-info">
+      <div>체크인</div>
+      <span id="checkin-date">-</span>
+      <div>체크아웃</div>
+      <span id="checkout-date">-</span>
+      <div id="nights">0박</div>
+    </div>
+    <div>
+      <div>객실 수</div>
+      <div class="room-control">
+        <button onclick="adjustCount('rooms', -1)">-</button>
+        <input id="rooms" type="text" value="1" readonly />
+        <button onclick="adjustCount('rooms', 1)">+</button>
+      </div>
+      <div>객실 인원</div>
+      <div class="room-control">
+        <button onclick="adjustCount('people', -1)">-</button>
+        <input id="people" type="text" value="1" readonly />
+        <button onclick="adjustCount('people', 1)">+</button>
+      </div>
+    </div>
+    <button class="search-btn">객실 검색</button>
+  </div>
+</div>
+
+<script>
+  const calendar1 = document.getElementById('calendar-1');
+  const calendar2 = document.getElementById('calendar-2');
+  const checkinEl = document.getElementById('checkin-date');
+  const checkoutEl = document.getElementById('checkout-date');
+  const nightsEl = document.getElementById('nights');
+
+  let selectedDates = [];
+
+  const waitingList = ['2025-08-22', '2025-08-23'];
+  const today = new Date();
+
+  function renderCalendar(container, year, month) {
+    container.innerHTML = '';
+
+    const header = document.createElement('div');
+    header.className = 'calendar-header';
+    header.innerHTML = `<span>${year}.${String(month + 1).padStart(2, '0')}</span>`;
+    container.appendChild(header);
+
+    const daysRow = document.createElement('div');
+    daysRow.className = 'days';
+    ['일','월','화','수','목','금','토'].forEach(day => {
+      const d = document.createElement('div');
+      d.className = 'day';
+      d.textContent = day;
+      daysRow.appendChild(d);
+    });
+    container.appendChild(daysRow);
+
+    const datesGrid = document.createElement('div');
+    datesGrid.className = 'dates';
+
+    const firstDate = new Date(year, month, 1);
+    const lastDate = new Date(year, month + 1, 0);
+    const startDay = firstDate.getDay();
+
+    // 빈 칸
+    for (let i = 0; i < startDay; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'date empty';
+      datesGrid.appendChild(empty);
+    }
+
+    for (let date = 1; date <= lastDate.getDate(); date++) {
+      const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+      const d = document.createElement('div');
+      d.className = 'date';
+      d.textContent = date;
+
+      if (waitingList.includes(fullDate)) {
+        d.classList.add('waiting');
+      }
+
+      d.addEventListener('click', () => handleDateClick(fullDate, d));
+      datesGrid.appendChild(d);
+    }
+
+    container.appendChild(datesGrid);
+  }
+
+  function handleDateClick(dateStr, el) {
+    const allDates = document.querySelectorAll('.date');
+    allDates.forEach(d => d.classList.remove('selected'));
+
+    selectedDates.push(dateStr);
+
+    if (selectedDates.length === 1) {
+      checkinEl.textContent = formatDate(dateStr);
+      checkoutEl.textContent = '-';
+      nightsEl.textContent = '0박';
+      el.classList.add('selected');
+    } else if (selectedDates.length === 2) {
+      const [start, end] = selectedDates.sort();
+      checkinEl.textContent = formatDate(start);
+      checkoutEl.textContent = formatDate(end);
+      const nights = calcNights(start, end);
+      nightsEl.textContent = `${nights}박`;
+
+      // highlight 범위
+      allDates.forEach(d => {
+        const y = parseInt(d.closest('.calendar').querySelector('.calendar-header span').textContent.split('.')[0]);
+        const m = parseInt(d.closest('.calendar').querySelector('.calendar-header span').textContent.split('.')[1]);
+        const dNum = parseInt(d.textContent);
+        const thisDate = `${y}-${String(m).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+        if (thisDate >= start && thisDate <= end) {
+          d.classList.add('selected');
+        }
+      });
+
+      selectedDates = [];
+    } else {
+      selectedDates = [dateStr];
+      handleDateClick(dateStr, el); // 다시 시작
+    }
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    const day = ['일','월','화','수','목','금','토'][d.getDay()];
+    return `${d.getMonth() + 1}.${d.getDate()}(${day})`;
+  }
+
+  function calcNights(start, end) {
+    const d1 = new Date(start);
+    const d2 = new Date(end);
+    return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+  }
+
+  function adjustCount(type, delta) {
+    const input = document.getElementById(type);
+    let val = parseInt(input.value);
+    val = Math.max(1, val + delta);
+    input.value = val;
+  }
+
+  // 초기 렌더링
+  renderCalendar(calendar1, 2025, 7); // 8월
+  renderCalendar(calendar2, 2025, 8); // 9월
+</script>
+
+</body>
+</html>

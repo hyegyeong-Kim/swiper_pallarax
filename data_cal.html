@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>캘린더</title>
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <style>
+    .dateHead div {color:#fff; text-align:center; border-radius:5px; background:#e31b20;}
+    .grid {display:grid; grid-template-columns:repeat(7, 1fr); grid-gap:5px;}
+    .grid li {padding:.6rem; font-size:.9rem;}
+    .dateBoard li {min-height:6rem; padding:.6rem .8rem; color:#222; font-weight:bold; border-radius:5px; border:1px solid #eee;}
+    .noColor {background:#eee;}
+    .header {padding:1rem 2rem; display:flex; justify-content:space-between;}
+    .btn {width:20px; height:20px; border:3px solid #000; border-width:3px 3px 0 0; display:block; cursor:pointer;}
+    .prevDay {transform:rotate(-135deg);}
+    .nextDay {transform:rotate(45deg);}
+    .rap {max-width:820px; margin-top:1.4rem; padding:0 1.4rem;}
+    .dateHead {margin:.4rem 0;}
+    .dateBoard li.today {color:#000; background-color:#ffeb3b; border:2px solid #e31b20;}
+    .dateBoard li a {margin-top:5px; color:#0077cc; font-size:0.8rem; display: block;}
+    .dateBoard li p.has-event {color: red;}
+  </style>
+</head>
+<body>
+  <div class='rap'>
+    <div class="header">
+      <div class="btn prevDay"></div>
+      <h2 class='dateTitle'></h2>
+      <div class="btn nextDay"></div>
+    </div>
+
+    <div class="grid dateHead">
+      <div>일</div>
+      <div>월</div>
+      <div>화</div>
+      <div>수</div>
+      <div>목</div>
+      <div>금</div>
+      <div>토</div>
+    </div>
+
+    <ul class="grid dateBoard"></ul>
+  </div>
+
+<script>
+  const data = [
+    { date: '2025-08-06', content: '테스트1', src: 'https://www.naver.com/' },
+    { date: '2025-08-03', content: '테스트2', src: 'https://www.daum.net/' },
+    { date: '2025-08-06', content: '테스트3', src: 'http://www.rianag.com' },
+    { date: '2025-08-21', content: '테스트4', src: 'https://www.naver.com/' },
+    { date: '2025-08-28', content: '테스트5', src: 'https://www.naver.com/' },
+    { date: '2025-08-29', content: '테스트6', src: 'https://www.naver.com/' },
+  ];
+
+  // ✅ content와 src를 배열로 저장
+  const calendarList = data.reduce((acc, { date, content, src }) => {
+    acc[date] = acc[date] || [];
+    acc[date].push({ content, src });
+    return acc;
+  }, {});
+
+  // 숫자 앞에 0 붙이기
+  
+  Number.prototype.pad = function () {
+    return this > 9 ? this : '0' + this;
+  };
+
+  const makeCalendar = (date) => {
+    const currentYear = new Date(date).getFullYear();
+    const currentMonth = new Date(date).getMonth() + 1;
+
+    const firstDay = new Date(date.setDate(1)).getDay();
+    const lastDay = new Date(currentYear, currentMonth, 0).getDate();
+    const limitDay = firstDay + lastDay;
+    const nextDay = Math.ceil(limitDay / 7) * 7;
+
+    let htmlDummy = '';
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).pad()}-${today.getDate().pad()}`;
+
+    // 이전달 빈 칸
+    for (let i = 0; i < firstDay; i++) {
+      htmlDummy += `<li class="noColor"></li>`;
+    }
+
+    // 이번달 날짜
+    for (let i = 1; i <= lastDay; i++) {
+      const dateStr = `${currentYear}-${currentMonth.pad()}-${i.pad()}`;
+      const isToday = dateStr === todayStr;
+      const hasData = calendarList[dateStr];
+
+      // 날짜 숫자를 <p>로 출력 + 클래스 조건부 적용
+      const dayLabel = `<p class="${hasData ? 'has-event' : ''}">${i}</p>`;
+
+      let contentHtml = '';
+      if (hasData) {
+        contentHtml = hasData
+          .map(
+            item =>
+              `<a href="${item.src}" target="_blank" rel="noopener noreferrer">${item.content}</a>`
+          )
+          .join('');
+      }
+
+      htmlDummy += `
+        <li class="${isToday ? 'today' : ''}">
+          ${dayLabel}
+          ${contentHtml}
+        </li>
+      `;
+    }
+
+    // 다음달 빈 칸
+    for (let i = limitDay; i < nextDay; i++) {
+      htmlDummy += `<li class="noColor"></li>`;
+    }
+
+    document.querySelector(`.dateBoard`).innerHTML = htmlDummy;
+    document.querySelector(`.dateTitle`).innerText = `${currentMonth}월 ${currentYear}년`;
+  };
+
+  const date = new Date(); // 오늘 날짜 기준
+  makeCalendar(date);
+
+  // 이전달 버튼
+  document.querySelector(`.prevDay`).onclick = () => {
+    makeCalendar(new Date(date.setMonth(date.getMonth() - 1)));
+  };
+
+  // 다음달 버튼
+  document.querySelector(`.nextDay`).onclick = () => {
+    makeCalendar(new Date(date.setMonth(date.getMonth() + 1)));
+  };
+</script>
+
+</body>
+</html>

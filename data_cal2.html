@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>캘린더</title>
+  <link rel="stylesheet" href="/assets/css/common.css">
+  <style>
+    .dateHead div {color:#fff; text-align:center; border-radius:5px; background:#e31b20;}
+    .grid {display:grid; grid-template-columns:repeat(7, 1fr); grid-gap:5px;}
+    .grid li {padding:.6rem; font-size:.9rem;}
+    .dateBoard li {min-height:6rem; padding:.6rem .8rem; color:#222; font-weight:bold; border-radius:5px; border:1px solid #eee;}
+    .noColor {background:#eee;}
+    .header {padding:1rem 2rem; display:flex; justify-content:space-between;}
+    .btn {width:20px; height:20px; border:3px solid #000; border-width:3px 3px 0 0; display:block; cursor:pointer;}
+    .prevDay {transform:rotate(-135deg);}
+    .nextDay {transform:rotate(45deg);}
+    .rap {max-width:820px; margin-top:1.4rem; padding:0 1.4rem;}
+    .dateHead {margin:.4rem 0;}
+    .dateBoard li.today {color:#000; background-color:#ffeb3b; border:2px solid #e31b20;}
+    .dateBoard li a {margin-top:5px; color:#0077cc; font-size:0.8rem; display: block;}
+    .dateBoard li p {margin-bottom:5px;}
+    .dateBoard li p.has-event {color: red;}
+    .dateBoard li button {width:100%;; margin-bottom:5px; padding:5px 10px; border-radius:5px; border:1px solid red; box-sizing:border-box; text-align:center; }
+    .dateBoard li button.disabled {border:1px solid #eee; background:#eee;}
+    .dateBoard li button:last-of-type {margin-bottom:0px;}
+  </style>
+</head>
+<body>
+  <div class='rap'>
+    <div class="header">
+      <div class="btn prevDay"></div>
+      <h2 class='dateTitle'>8월 2025년</h2>
+      <div class="btn nextDay"></div>
+    </div>
+
+    <div class="grid dateHead">
+      <div>일</div>
+      <div>월</div>
+      <div>화</div>
+      <div>수</div>
+      <div>목</div>
+      <div>금</div>
+      <div>토</div>
+    </div>
+
+    <ul class="grid dateBoard">
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li>
+        <p class="has-event">1</p>
+        <a href="#">테스트</a>
+      </li>
+      <li>
+        <p>2</p>
+        <button class="res">예약가능</button>
+        <button class="disabled" disabled>예약불가</button>
+      </li>
+      <li class="today"><p>3</p></li>
+      <li><p>4</p></li>
+      <li><p>5</p></li>
+      <li><p>6</p></li>
+      <li><p>7</p></li>
+      <li><p>8</p></li>
+      <li><p>9</p></li>
+      <li><p>10</p></li>
+      <li><p>11</p></li>
+      <li><p>12</p></li>
+      <li>
+        <p class="has-event">13</p>
+        <a href="#">테스트</a>
+      </li>
+      <li><p>14</p></li>
+      <li><p>15</p></li>
+      <li><p>16</p></li>
+      <li><p>17</p></li>
+      <li><p>18</p></li>
+      <li><p>19</p></li>
+      <li><p>20</p></li>
+      <li><p>21</p></li>
+      <li>
+        <p class="has-event">22</p>
+        <a href="#">테스트</a>
+      </li>
+      <li><p>23</p></li>
+      <li><p>24</p></li>
+      <li><p>25</p></li>
+      <li><p>26</p></li>
+      <li><p>27</p></li>
+      <li><p>28</p></li>
+      <li><p>29</p></li>
+      <li><p>30</p></li>
+      <li><p>31</p></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+      <li class="noColor"></li>
+
+    </ul>
+  </div>
+
+</body>
+</html>

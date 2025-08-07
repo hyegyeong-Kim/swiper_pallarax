@@ -32,6 +32,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {outline: 2px 
 
 em,i {font-style: normal;}
 
-body > div {border:5px solid skyblue;}
+/* body > div {border:5px solid skyblue;} */
 
 input[type="checkbox"] {width:20px; height:20px; accent-color:blue;}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>count</title>
+</head>
+<style>
+    .count_wrap {display:flex; align-items:center;}
+    .count_wrap button {width:30px; height:30px; background:#eee;}
+    .count_wrap p {width:50px; text-align:center;}
+</style>
+<body>
+    <div class="count_wrap">
+        <button onclick="decrease()">-</button>
+        <p>1</p>
+        <button onclick="increase()">+</button>
+    </div>
+
+<script>
+    let count = 1
+    let counter = document.querySelector('.count_wrap p')
+    function increase(){
+        count++;
+        counter.textContent = count;
+    }
+    function decrease() {
+      if (count > 1) {
+        count--;
+        counter.textContent = count;
+      }
+    }
+</script>
+</body>
+</html>

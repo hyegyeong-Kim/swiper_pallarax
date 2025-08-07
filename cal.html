@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UL 기반 예약 캘린더</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .calendar {
+      max-width: 1280px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      padding: 20px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .calendar-header button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-grid .day-name {
+        height:auto;
+      font-weight: bold;
+      text-align: center;
+      padding: 8px 0;
+      background: #eaeaea;
+    }
+
+    .calendar-grid li {
+      list-style: none;
+      border: 1px solid #eee;
+      height: 100px;
+      padding: 5px;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .calendar-grid .empty {
+      background-color: #f9f9f9;
+      border: none;
+    }
+
+    .btn {
+      margin-top: auto;
+      padding: 4px;
+      font-size: 12px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn.disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    .calendar-grid li.today {
+      border: 2px solid #4caf50;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calendar">
+  <div class="calendar-header">
+    <button onclick="changeMonth(-1)">←</button>
+    <h2 id="monthYear">2025년 8월</h2>
+    <button onclick="changeMonth(1)">→</button>
+  </div>
+  <ul class="calendar-grid" id="calendarGrid">
+    <!-- 요일 -->
+    <li class="day-name">일</li>
+    <li class="day-name">월</li>
+    <li class="day-name">화</li>
+    <li class="day-name">수</li>
+    <li class="day-name">목</li>
+    <li class="day-name">금</li>
+    <li class="day-name">토</li>
+    <!-- 날짜 -->
+  </ul>
+</div>
+
+<script>
+  let today = new Date();
+  let currentMonth = today.getMonth();
+  let currentYear = today.getFullYear();
+
+  const disabledDates = [
+    "2025-08-06",
+    "2025-08-15"
+  ];
+
+  function generateCalendar(month, year) {
+    const calendarGrid = document.getElementById("calendarGrid");
+    const monthYear = document.getElementById("monthYear");
+
+    // 초기화 (요일 제외하고 지우기)
+    while (calendarGrid.children.length > 7) {
+      calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    monthYear.textContent = `${year}년 ${month + 1}월`;
+
+    let date = 1;
+
+    // 앞 빈 칸
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("li");
+      empty.className = "empty";
+      calendarGrid.appendChild(empty);
+    }
+
+    // 날짜 채우기
+    for (let i = 1; i <= daysInMonth; i++) {
+      const fullDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      const li = document.createElement("li");
+
+      // 오늘 표시
+      const isToday = new Date().toDateString() === new Date(year, month, i).toDateString();
+      if (isToday) li.classList.add("today");
+
+      const isDisabled = disabledDates.includes(fullDate);
+      const button = document.createElement("button");
+      button.textContent = isDisabled ? "예약불가" : "예약";
+      button.className = isDisabled ? "btn disabled" : "btn";
+      button.dataset.date = fullDate;
+
+      button.onclick = () => {
+        if (button.classList.contains('disabled')) return;
+        alert(`📅 ${fullDate} 예약하시겠습니까?`);
+      };
+
+      li.innerHTML = `<div>${i}</div>`;
+      li.appendChild(button);
+      calendarGrid.appendChild(li);
+    }
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    generateCalendar(currentMonth, currentYear);
+  }
+
+  generateCalendar(currentMonth, currentYear);
+</script>
+
+</body>
+</html>

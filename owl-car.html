@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OwlCarousel - Vertical Only (No Horizontal Drag)</title>
+
+  <!-- OwlCarousel CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+  <style>
+    body { margin:0; font-family:system-ui, sans-serif; background:#f7f7f7; }
+    .wrap { max-width:1920px; margin:0 auto; padding:0 16px; }
+
+    /* 레이아웃 */
+    .cont_warp {
+    padding-top:500px;
+    display:flex;
+    gap:24px;              /* 선택: 좌우 간격 */
+    align-items:flex-start;
+    }
+    .cont_warp p {
+    border:2px solid red;
+    flex: 0 0 auto;        /* 이미지 영역은 내용 크기만큼 */
+    }
+    .cont_warp p img {
+    max-width:100%;
+    height:auto;
+    display:block;
+    }
+
+    /* ★ flex 자식인 캐러셀 수축 허용 → 빈 아이템 방지 */
+    .cont_warp > .owl-carousel {
+    min-width:0;           /* 중요 */
+    flex: 1 1 auto;        /* 남는 공간 채우기 */
+    }
+
+    /* Owl 기본 */
+    .owl-carousel {
+    border:2px solid green;
+    /* overflow: hidden;  ← 제거: stage-outer가 담당 */
+    }
+    .owl-stage-outer {        /* 실제 클리핑은 여기서 */
+    overflow:hidden;
+    }
+
+    /* 아이템 */
+    .owl-carousel .item{
+    height:60vh; min-height:260px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:42px; color:#fff; border-radius:16px;
+    }
+    .owl-carousel .item:nth-child(3n+1){ background:#6c5ce7; }
+    .owl-carousel .item:nth-child(3n+2){ background:#0984e3; }
+    .owl-carousel .item:nth-child(3n+3){ background:#00b894; }
+
+    /* 네비 버튼 */
+    .owl-nav button{
+    width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+    border-radius:50%; background:#fff !important; box-shadow:0 2px 8px rgba(0,0,0,.12);
+    transition:transform .2s;
+    }
+    .owl-nav button:hover{ transform:translateY(-2px); }
+
+    /* 수직 전환 애니메이션 */
+    .animated{ animation-duration:.5s; animation-fill-mode:both; }
+    @keyframes fromBottom { from{transform:translateY(100%); opacity:0} to{transform:translateY(0); opacity:1} }
+    @keyframes toTop     { from{transform:translateY(0);    opacity:1} to{transform:translateY(-100%); opacity:0} }
+    @keyframes fromTop   { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0); opacity:1} }
+    @keyframes toBottom  { from{transform:translateY(0);    opacity:1} to{transform:translateY(100%); opacity:0} }
+    .fromBottom{ animation-name: fromBottom; }
+    .toTop{ animation-name: toTop; }
+    .fromTop{ animation-name: fromTop; }
+    .toBottom{ animation-name: toBottom; }
+
+    /* 애니메이션 시 레이어 안정화 */
+    .owl-item { position: relative; }
+    .owl-item .owl-animated-out{
+    position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+    }
+    .owl-item .owl-animated-in{ z-index:0; }
+
+    /* 활성 슬라이드는 항상 보이도록 안전장치 */
+    .owl-item.active .item{
+    opacity:1 !important;
+    transform:none !important;
+    }
+
+    /* 가로 패닝 차단: 좌우 스크롤 제스처 방지 */
+    .owl-stage-outer, .owl-stage { touch-action: pan-y; }
+
+    section { height:150vh; }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>OwlCarousel - 세로 전환만 / 가로 드래그 차단</h1>
+        <div class="cont_warp">
+            <p>
+                <img src="/assets/img/Frame 89 on.png" alt="">
+            </p>
+            <div class="owl-carousel" id="myCarousel">
+                <div class="item">1</div>
+                <div class="item">2</div>
+                <div class="item">3</div>
+                <div class="item">4</div>
+                <div class="item">5</div>
+                <div class="item">6</div>
+            </div>
+        </div>
+        <section>
+            <p>test</p>
+        </section>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Mousewheel (선택) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+  <!-- OwlCarousel JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+  <script>
+    $(function () {
+      const $owl = $("#myCarousel");
+      function resetActiveStyles() {
+        // 활성/다음 후보 슬라이드는 항상 보이는 상태로 초기화
+        $('.owl-item').find('.item').css({ opacity: '', transform: '' });
+        }
+
+      // 이동 방향에 따라 애니메이션 할당
+        function setVerticalAnim(direction){
+            const api = $owl.data('owl.carousel');
+            if (!api) return;
+            if (direction === 'next') {
+                api.settings.animateOut = 'toTop';
+                api.settings.animateIn  = 'fromBottom';
+            } else {
+                api.settings.animateOut = 'toBottom';
+                api.settings.animateIn  = 'fromTop';
+            }
+            resetActiveStyles(); // ★ 추가: 애니메이션 적용 직전 초기화
+        }
+
+      // ✅ 가로 드래그 완전 차단
+      $owl.owlCarousel({
+        items: 1,
+        loop: true,
+        margin: 0,
+        // nav: true,
+        // dots: true,
+        autoplay: false,
+        smartSpeed: 550,
+        mouseDrag: false,   // ← 가로 마우스 드래그 비활성
+        touchDrag: false,   // ← 가로 터치 드래그 비활성
+        pullDrag: false,    // ← 가로 끌기 관성 제거
+        // freeDrag: false, // (버전에 따라 옵션 무시될 수 있음)
+        animateIn: 'fromBottom',
+        animateOut: 'toTop',
+        responsive: { 0:{items:1}, 768:{items:1}, 1024:{items:1} }
+      });
+
+      // 안전장치: 자동재생 강제 정지
+      $owl.trigger('stop.owl.autoplay');
+
+      // ─────────────────────────────────────────────
+      // 세로 스와이프(위/아래)만 인식하는 커스텀 제스처
+      // ─────────────────────────────────────────────
+      const $stage = $owl.find('.owl-stage-outer'); // 터치 영역
+      let startX = 0, startY = 0, active = false, lockedDir = null;
+      const THRESHOLD = 40;      // 스와이프 인식 임계값(px)
+      let swipeLock = false;
+      const SWIPE_LOCK_MS = 560; // 중복 입력 잠금
+
+      // 수직 스와이프 → 슬라이드 전환
+      function triggerByDelta(dy){
+        if (swipeLock) return;
+        swipeLock = true;
+        setTimeout(()=> swipeLock = false, SWIPE_LOCK_MS);
+
+        if (dy < 0) {          // 위로 스와이프(손가락 위로) → 이전 슬라이드
+          setVerticalAnim('prev');
+          $owl.trigger('prev.owl.carousel');
+        } else {               // 아래로 스와이프 → 다음 슬라이드
+          setVerticalAnim('next');
+          $owl.trigger('next.owl.carousel');
+        }
+      }
+
+      // Pointer Events(마우스/펜/터치 통합)
+      function onPointerDown(e){
+        active = true;
+        lockedDir = null;
+        const p = point(e);
+        startX = p.x; startY = p.y;
+      }
+      function onPointerMove(e){
+        if (!active) return;
+        const p = point(e);
+        const dx = p.x - startX;
+        const dy = p.y - startY;
+
+        // 방향 잠금 결정(처음 큰 이동에서 1회 결정)
+        if (!lockedDir){
+          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8){
+            lockedDir = 'vertical';
+          } else if (Math.abs(dx) > 8){
+            lockedDir = 'horizontal';
+          }
+        }
+
+        // 가로는 아예 작동 금지
+        if (lockedDir === 'horizontal'){
+          // 좌우 스크롤 방지
+          e.preventDefault();
+          return;
+        }
+
+        if (lockedDir === 'vertical'){
+          // 페이지 기본 스크롤을 막을지 여부 선택:
+          // 슬라이드 전환 우선이면 막고, 페이지 스크롤도 허용하려면 주석 처리
+          e.preventDefault();
+
+          if (Math.abs(dy) >= THRESHOLD){
+            triggerByDelta(dy);
+            active = false; // 한 번만 트리거
+          }
+        }
+      }
+      function onPointerUp(){ active = false; lockedDir = null; }
+
+      // 좌표 구하기 유틸
+      function point(e){
+        const oe = e.originalEvent || e;
+        if (oe.touches && oe.touches[0]) {
+          return { x: oe.touches[0].clientX, y: oe.touches[0].clientY };
+        }
+        if (oe.changedTouches && oe.changedTouches[0]) {
+          return { x: oe.changedTouches[0].clientX, y: oe.changedTouches[0].clientY };
+        }
+        return { x: oe.clientX, y: oe.clientY };
+      }
+
+      // passive:false 로 등록해야 preventDefault 가능
+      $stage.on('pointerdown', onPointerDown);
+      $stage.on('pointermove', onPointerMove);
+      $stage.on('pointerup pointercancel pointerleave', onPointerUp);
+
+      // ─────────────────────────────────────────────
+      // 휠(데스크톱) 전환 유지: 가로 스크롤 없음
+      // ─────────────────────────────────────────────
+      let wheelLock = false;
+      const WHEEL_LOCK_MS = 560;
+      const mql = window.matchMedia("(pointer: fine) and (hover: hover)");
+      function onWheel(e){
+        if (!mql.matches) return;
+        if (wheelLock) return;
+        wheelLock = true;
+        setTimeout(() => wheelLock = false, WHEEL_LOCK_MS);
+
+        const dy = e.originalEvent.deltaY;
+        if (dy > 0) { setVerticalAnim('next'); $owl.trigger("next.owl.carousel"); }
+        else        { setVerticalAnim('prev'); $owl.trigger("prev.owl.carousel"); }
+        e.preventDefault();
+      }
+      $owl.on("mousewheel", ".owl-stage", onWheel);
+
+      // 네비 버튼 클릭 시에도 방향 맞추기
+      $owl.on('click', '.owl-next', () => setVerticalAnim('next'));
+      $owl.on('click', '.owl-prev', () => setVerticalAnim('prev'));
+    });
+  </script>
+</body>
+</html>

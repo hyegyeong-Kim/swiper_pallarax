@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/assets/css/common.css">
+    <style>
+        :root {--panel-width:calc(100% / 7); --darkblue:#02020c; --white:#fff; --lightgray:#eee;}
+        h1 {font-size:3rem;}
+        body {height:100vh; color:var(--white); background-color:var(--darkblue); overflow:hidden;}
+        .page_header {padding:20px; display:flex; justify-content:flex-end;}
+        .page_header ul {display:flex; gap:20px;}
+        .page_header ul li a {color:var(--white)}
+        .page_main {padding:20px; opacity:0; transform:translateY(100px); transition:all 0.5s;}
+        .second_round .page_main {opacity:1; transform:translateY(0); transition-delay:1s;}
+        .panels .panel {width:var(--panel-width); border-right:1px solid #000; background:var(--lightgray); position:fixed; left:0; top:0; bottom:0; clip-path:inset(100% 0 0 0); transition:0.5s ease-in-out;}
+        .panels .panel:nth-child(2) {left:calc(var(--panel-width));}
+        .panels .panel:nth-child(3) {left:calc(var(--panel-width) * 2);}
+        .panels .panel:nth-child(4) {left:calc(var(--panel-width) * 3);}
+        .panels .panel:nth-child(5) {left:calc(var(--panel-width) * 4);}
+        .panels .panel:nth-child(6) {left:calc(var(--panel-width) * 5);}
+        .panels .panel:nth-child(7) {left:calc(var(--panel-width) * 6);}
+
+        .loaded .panels .panel {clip-path:inset(0); transition-delay:calc(var(--index) * 0.06s);}
+        .second_round .panels .panel {clip-path:inset(0 0 100% 0);}
+        .third_round {overflow:auto;}
+
+    </style>
+</head>
+<body>
+    <header class="page_header">
+        <nav>
+            <ul>
+                <li><a href="/tt/index.html">Home</a></li>
+                <li><a href="/tt/about.html">About</a></li>
+                <li><a href="/tt/contect.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <ul class="panels">
+        <li class="panel" style="--index: 3"></li>
+        <li class="panel" style="--index: 2"></li>
+        <li class="panel" style="--index: 1"></li>
+        <li class="panel" style="--index: 0"></li>
+        <li class="panel" style="--index: 1"></li>
+        <li class="panel" style="--index: 2"></li>
+        <li class="panel" style="--index: 3"></li>
+    </ul>
+    <main class="page_main">
+        <div>
+            <h1>Home Page</h1>
+        </div>
+    </main>
+    <script>
+        const body = document.body;
+        const lastPanel = document.querySelector('.panels .panel:last-child')
+        window.addEventListener('load', ()=>{
+            body.classList.add('loaded');
+            lastPanel.addEventListener('transitionend', ()=>{
+                if(body.classList.contains('second_round')){
+                    body.classList.add('third_round')
+                } else {
+                    body.classList.add('second_round')
+                }
+            })
+        })
+    </script>
+</body>
+</html>

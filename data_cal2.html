@@ -6,24 +6,46 @@
   <title>캘린더</title>
   <link rel="stylesheet" href="/assets/css/common.css">
   <style>
-    .dateHead div {color:#fff; text-align:center; border-radius:5px; background:#e31b20;}
-    .grid {display:grid; grid-template-columns:repeat(7, 1fr); grid-gap:5px;}
-    .grid li {padding:.6rem; font-size:.9rem;}
-    .dateBoard li {min-height:6rem; padding:.6rem .8rem; color:#222; font-weight:bold; border-radius:5px; border:1px solid #eee;}
-    .noColor {background:#eee;}
-    .header {padding:1rem 2rem; display:flex; justify-content:space-between;}
-    .btn {width:20px; height:20px; border:3px solid #000; border-width:3px 3px 0 0; display:block; cursor:pointer;}
-    .prevDay {transform:rotate(-135deg);}
-    .nextDay {transform:rotate(45deg);}
-    .rap {max-width:820px; margin-top:1.4rem; padding:0 1.4rem;}
-    .dateHead {margin:.4rem 0;}
-    .dateBoard li.today {color:#000; background-color:#ffeb3b; border:2px solid #e31b20;}
-    .dateBoard li a {margin-top:5px; color:#0077cc; font-size:0.8rem; display: block;}
-    .dateBoard li p {margin-bottom:5px;}
-    .dateBoard li p.has-event {color: red;}
-    .dateBoard li button {width:100%;; margin-bottom:5px; padding:5px 10px; border-radius:5px; border:1px solid red; box-sizing:border-box; text-align:center; }
-    .dateBoard li button.disabled {border:1px solid #eee; background:#eee;}
-    .dateBoard li button:last-of-type {margin-bottom:0px;}
+.rap { max-width:820px; margin-top:1.4rem; padding:0 1.4rem;}
+.header {padding:1rem 2rem; display:flex; justify-content:space-between;}
+.btn {width:20px; height:20px; border:3px solid #000; border-width:3px 3px 0 0; display:block; cursor:pointer; }
+.prevDay { transform: rotate(-135deg); }
+.nextDay { transform: rotate(45deg); }
+
+/* ===== 요일 헤더 ===== */
+.dateHead {margin: .4rem 0; display: flex; flex-wrap: wrap;}
+.dateHead > div {padding:.5rem 0; color:#000; border:none; box-sizing:border-box; text-align:center; flex:0 0 calc(100% / 7); }
+.sunday, .holiday {color:red !important; }
+.saturday {color:blue !important; }
+
+/* ===== 달력 바디 ===== */
+.dateBoard {width:100%; margin:0; padding:0; border:1px solid #ddd; list-style:none; display:flex; flex-wrap:wrap;}
+.dateBoard > li {padding:.6rem .8rem; color:#222; font-size:.9rem; font-weight:bold; cursor:pointer; background:#fff; border-right:1px solid #ddd;border-bottom:1px solid #ddd;flex:0 0 calc(100% / 7); box-sizing:border-box; aspect-ratio:1 / 1;}
+
+/* 마지막 열 border-right 제거 */
+.dateBoard > li:nth-child(7n) {border-right: none;}
+/* 마지막 행 border-bottom 제거 (필요 시 행 수 계산해서 nth-last-child 사용 가능) */
+.dateBoard > li:nth-last-child(-n+7) {border-bottom: none;}
+
+/* ===== 상태/디테일 ===== */
+li.noColor {background: #eee; }
+.dateBoard li.event { background:#ffeb3b; color:#000; }
+.dateBoard li.checkOn { box-shadow: inset 0 0 0 2px #000; } /* 선택된 날짜 */
+.dateBoard li.race { background: greenyellow; }
+
+.dateBoard li p { margin-bottom: 5px; }
+.dateBoard li a { margin-top: 5px; color: #0077cc; font-size:.8rem; display:block; }
+
+/* 말풍선(잔여타임) */
+.dateBoard li:not(.noColor){position: relative; }
+.dateBoard li:not(.noColor) p span {width:70%; padding:5px; font-size:10px; text-align:center;color:#000; background:#fff; border:1px solid #000; position: absolute; right:-10px; top:30px; z-index:2; display:none;}
+.dateBoard li:hover:not(.noColor) p span {display:block; }
+
+/* 버튼 */
+.dateBoard li button {width:100%; margin-bottom:5px; padding:5px 10px; border-radius:5px; border:1px solid red; box-sizing:border-box; text-align:center;}
+.dateBoard li button.disabled {border:1px solid #eee; background:#eee; }
+.dateBoard li button:last-of-type {margin-bottom:0; }
+
   </style>
 </head>
 <body>
@@ -35,71 +57,71 @@
     </div>
 
     <div class="grid dateHead">
-      <div>일</div>
+      <div class="sunday">일</div>
       <div>월</div>
       <div>화</div>
       <div>수</div>
       <div>목</div>
       <div>금</div>
-      <div>토</div>
+      <div class="saturday">토</div>
     </div>
 
     <ul class="grid dateBoard">
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li>
+      <li class="blank"></li>
+      <li class="blank"></li>
+      <li class="blank"></li>
+      <li class="blank"></li>
+      <li class="blank"></li>
+      <li class="noColor">
         <p class="has-event">1</p>
         <a href="#">테스트</a>
       </li>
-      <li>
+      <li class="noColor">
         <p>2</p>
         <button class="res">예약가능</button>
         <button class="disabled" disabled>예약불가</button>
       </li>
-      <li class="today"><p>3</p></li>
-      <li><p>4</p></li>
-      <li><p>5</p></li>
-      <li><p>6</p></li>
-      <li><p>7</p></li>
-      <li><p>8</p></li>
-      <li><p>9</p></li>
-      <li><p>10</p></li>
-      <li><p>11</p></li>
-      <li><p>12</p></li>
+      <li class="noColor"><p class="sunday">3</p></li>
+      <li class="noColor"><p>4</p></li>
+      <li class="noColor"><p>5</p></li>
+      <li class="noColor"><p>6</p></li>
+      <li class="noColor"><p>7</p></li>
+      <li class="noColor"><p>8</p></li>
+      <li class="event"><p class="saturday">9</p></li>
+      <li><p class="sunday">10<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>11<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>12<span>잔여타임 : <em>10</em></span></p></li>
       <li>
-        <p class="has-event">13</p>
+        <p class="has-event">13 <span>잔여타임 : <em>10</em></span></p>
         <a href="#">테스트</a>
       </li>
-      <li><p>14</p></li>
-      <li><p>15</p></li>
-      <li><p>16</p></li>
-      <li><p>17</p></li>
-      <li><p>18</p></li>
-      <li><p>19</p></li>
-      <li><p>20</p></li>
-      <li><p>21</p></li>
+      <li><p>14<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>15<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p class="saturday">16<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p class="sunday">17<span>잔여타임 : <em>10</em></span></p></li>
+      <li class="race"><p>18<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>19<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>20<span>잔여타임 : <em>10</em></span></p></li>
+      <li><p>21<span>잔여타임 : <em>10</em></span></p></li>
       <li>
         <p class="has-event">22</p>
         <a href="#">테스트</a>
       </li>
-      <li><p>23</p></li>
-      <li><p>24</p></li>
-      <li><p>25</p></li>
+      <li><p class="saturday">23</p></li>
+      <li><p class="sunday">24</p></li>
+      <li class="checkOn"><p>25</p></li>
       <li><p>26</p></li>
       <li><p>27</p></li>
       <li><p>28</p></li>
       <li><p>29</p></li>
-      <li><p>30</p></li>
-      <li><p>31</p></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
-      <li class="noColor"></li>
+      <li><p class="saturday">30</p></li>
+      <li><p class="sunday">31</p></li>
+      <li class=""></li>
+      <li class=""></li>
+      <li class=""></li>
+      <li class=""></li>
+      <li class=""></li>
+      <li class=""></li>
 
     </ul>
   </div>
